@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+        <%= title %>
+    </title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn .4s ease-out;
+        }
+
+        .input-focus:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, .1);
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            transition: all .3s ease;
+        }
+
+        .btn-gradient:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            transform: translateY(-1px);
+        }
+
+        .btn-gradient:active {
+            transform: scale(.98);
+        }
+
+        .task-item {
+            transition: all .2s ease;
+        }
+
+        .task-item:hover {
+            box-shadow: 0 4px 12px -4px rgba(0, 0, 0, .1);
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+
+    <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- HEADER -->
+        <div class="mb-8 fade-in">
+            <div class="flex items-center gap-3 mb-6">
+                <a href="/projects-page/<%= projectId %>/tasks"
+                    class="p-2 rounded-lg bg-white border-2 border-gray-200 hover:border-blue-200 hover:bg-blue-50 transition">
+                    <i data-lucide="arrow-left" class="w-5 h-5 text-gray-600"></i>
+                </a>
+
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-blue-600 rounded-lg">
+                        <i data-lucide="check-square" class="w-6 h-6 text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">
+                            Tambah Task
+                        </h1>
+                        <p class="text-sm text-gray-600">
+                            Project: <b>
+                                <%= projectName %>
+                            </b>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FORM -->
+        <div class="fade-in">
+            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+
+                <div class="bg-gradient-to-r from-blue-50 to-blue-100 px-6 py-6 border-b border-blue-200">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-white rounded-lg shadow-sm">
+                            <i data-lucide="list-checks" class="w-5 h-5 text-blue-600"></i>
+                        </div>
+                        <h2 class="text-lg font-bold text-gray-900">Daftar Task</h2>
+                    </div>
+                </div>
+
+                <form id="taskForm" class="p-6 sm:p-8">
+                    <div id="taskContainer" class="space-y-4">
+
+                        <!-- DEFAULT TASK -->
+                        <div class="task-item border-2 border-gray-200 rounded-xl p-4 sm:p-5">
+                            <div class="flex gap-4">
+
+                                <div class="drag-handle cursor-move pt-1 text-gray-400 hover:text-blue-600">
+                                    <i data-lucide="grip-vertical"></i>
+                                </div>
+
+                                <div class="flex-1">
+                                    <h4 class="text-sm font-bold text-gray-700 mb-3">
+                                        Task #1
+                                    </h4>
+
+                                    <div class="space-y-3">
+                                        <input type="text" name="nama[]" required placeholder="Judul task"
+                                            class="input-focus w-full rounded-lg border-2 border-gray-200 px-4 py-3 text-sm">
+
+                                        <textarea name="deskripsi[]" rows="3" placeholder="Deskripsi task (opsional)"
+                                            class="input-focus w-full rounded-lg border-2 border-gray-200 px-4 py-3 text-sm resize-none"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- ACTIONS -->
+                    <div class="mt-8 pt-6 border-t border-gray-200 flex flex-col sm:flex-row gap-3 justify-between">
+
+                        <button type="button" onclick="addTask()"
+                            class="inline-flex items-center gap-2 rounded-lg bg-white border-2 border-blue-200 px-5 py-3 text-sm font-semibold text-blue-600 hover:bg-blue-50">
+                            <i data-lucide="plus"></i>
+                            Tambah Task
+                        </button>
+
+                        <button type="submit"
+                            class="btn-gradient inline-flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/30">
+                            <i data-lucide="check"></i>
+                            Simpan Semua Task
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+
+            updateNumbers();
+
+            new Sortable(taskContainer, {
+                animation: 200,
+                handle: '.drag-handle',
+                ghostClass: 'bg-blue-50',
+                onEnd: updateNumbers,
+            });
+        });
+
+        const taskContainer = document.getElementById('taskContainer');
+        const form = document.getElementById('taskForm');
+
+        // ================= ADD TASK =================
+        function addTask() {
+            const div = document.createElement('div');
+            div.className = 'task-item border-2 border-gray-200 rounded-xl p-4 sm:p-5';
+
+            div.innerHTML = `
+            <div class="flex gap-4">
+                <div class="drag-handle cursor-move pt-1 text-gray-400 hover:text-blue-600">
+                    <i data-lucide="grip-vertical"></i>
+                </div>
+
+                <div class="flex-1 relative">
+                    <button type="button"
+                        class="absolute -top-2 -right-2 w-7 h-7 flex items-center justify-center rounded-full bg-red-100 text-red-600 hover:bg-red-200">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+
+                    <h4 class="text-sm font-bold text-gray-700 mb-3"></h4>
+
+                    <div class="space-y-3">
+                        <input
+                            type="text"
+                            name="nama[]"
+                            required
+                            placeholder="Judul task"
+                            class="input-focus w-full rounded-lg border-2 border-gray-200 px-4 py-3 text-sm">
+
+                        <textarea
+                            name="deskripsi[]"
+                            rows="3"
+                            placeholder="Deskripsi task (opsional)"
+                            class="input-focus w-full rounded-lg border-2 border-gray-200 px-4 py-3 text-sm resize-none"></textarea>
+                    </div>
+                </div>
+            </div>
+        `;
+
+            // tombol hapus
+            div.querySelector('button').addEventListener('click', () => {
+                div.remove();
+                updateNumbers();
+            });
+
+            taskContainer.appendChild(div);
+            updateNumbers();
+            lucide.createIcons();
+        }
+
+        // ================= UPDATE NUMBER =================
+        function updateNumbers() {
+            document.querySelectorAll('.task-item h4').forEach((el, i) => {
+                el.textContent = `Task #${i + 1}`;
+            });
+        }
+
+        // ================= SUBMIT FORM =================
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const nama = [...document.querySelectorAll('input[name="nama[]"]')]
+                .map(i => i.value.trim());
+
+            const deskripsi = [...document.querySelectorAll('textarea[name="deskripsi[]"]')]
+                .map(t => t.value.trim());
+
+            if (nama.length === 0) {
+                alert('Minimal satu task harus diisi');
+                return;
+            }
+
+            try {
+                const res = await fetch('/projects/<%= projectId %>/tasks', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ nama, deskripsi }),
+                });
+
+                const result = await res.json();
+
+                if (!res.ok) {
+                    alert(result.message || 'Gagal menyimpan task');
+                    return;
+                }
+
+                // sukses → redirect manual
+                window.location.href =
+                    `/projects-page/<%= projectId %>/tasks?success=task_created`;
+
+            } catch (err) {
+                console.error(err);
+                alert('Terjadi kesalahan koneksi');
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,289 @@
+<!-- src/views/login.ejs -->
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login - Project Management</title>
+    <link rel="stylesheet" href="/css/tailwind.css" />
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .slide-down {
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .input-focus:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .input-error:focus {
+            outline: none;
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
+        .gradient-bg-alt {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-gradient:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            transform: translateY(-1px);
+        }
+
+        .btn-gradient:active {
+            transform: scale(0.98);
+        }
+
+        .btn-gradient:disabled {
+            background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+            cursor: not-allowed;
+            transform: none;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen bg-gray-100">
+    <div class="min-h-screen flex items-center justify-center px-4 py-8">
+        <div class="w-full max-w-md relative z-10 fade-in">
+            <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
+                <!-- Header Section -->
+                <div class="gradient-bg-alt p-8 text-center relative overflow-hidden">
+                    <div class="absolute inset-0 bg-black opacity-5"></div>
+
+                    <div class="relative z-10">
+                        <div
+                            class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-white shadow-lg">
+                            <i data-lucide="folder" class="w-10 h-10 text-blue-600"></i>
+                        </div>
+
+                        <h1 class="text-3xl font-bold text-white mb-2">
+                            Selamat Datang
+                        </h1>
+                        <p class="text-blue-100 text-sm">
+                            Masuk ke Project Management App
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Form Section -->
+                <div class="p-8">
+                    <div class="mb-6 text-center">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-1">
+                            Login ke Akun Anda
+                        </h2>
+                        <p class="text-sm text-gray-500">
+                            Kelola project dengan mudah dan efisien
+                        </p>
+                    </div>
+
+                    <!-- Error Message -->
+                    <div id="error" class="hidden mb-5 slide-down">
+                        <div class="rounded-lg bg-red-100 border border-red-400 p-4">
+                            <div class="flex items-start gap-3">
+                                <div class="flex-shrink-0">
+                                    <i data-lucide="alert-circle" class="w-5 h-5 text-red-700"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="text-sm font-semibold text-red-800 mb-1">
+                                        Login Gagal
+                                    </h3>
+                                    <p class="text-sm text-red-700" id="error-message"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Login Form -->
+                    <form id="loginForm" class="space-y-5">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <i data-lucide="mail" class="w-4 h-4 inline mr-1"></i>
+                                Email
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i data-lucide="at-sign" class="w-5 h-5 text-gray-400"></i>
+                                </div>
+                                <input type="email" id="email" required placeholder="nama@email.com"
+                                    class="input-focus w-full rounded-lg border-2 border-gray-200 pl-10 pr-4 py-3 text-sm transition-all hover:border-gray-300 focus:border-blue-500" />
+                            </div>
+                            <p class="mt-1 text-xs text-red-600 hidden" id="email-error">
+                                <i data-lucide="alert-circle" class="w-3 h-3 inline mr-1"></i>
+                                Email tidak valid
+                            </p>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                <i data-lucide="lock" class="w-4 h-4 inline mr-1"></i>
+                                Password
+                            </label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i data-lucide="key" class="w-5 h-5 text-gray-400"></i>
+                                </div>
+                                <input type="password" id="password" required placeholder="••••••••"
+                                    class="input-focus w-full rounded-lg border-2 border-gray-200 pl-10 pr-12 py-3 text-sm transition-all hover:border-gray-300 focus:border-blue-500" />
+                                <button type="button" onclick="togglePassword()"
+                                    class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
+                                    <i data-lucide="eye" id="eye-icon" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                            <p class="mt-1 text-xs text-red-600 hidden" id="password-error">
+                                <i data-lucide="alert-circle" class="w-3 h-3 inline mr-1"></i>
+                                Password wajib diisi
+                            </p>
+                        </div>
+
+                        <button type="submit" id="submitBtn"
+                            class="btn-gradient w-full rounded-lg py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/30 hover:shadow-xl hover:shadow-blue-600/40 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                            <i data-lucide="log-in" class="w-4 h-4 inline mr-2"></i>
+                            Masuk ke Dashboard
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Footer -->
+                <div class="bg-gray-50 px-8 py-4 border-t border-gray-100">
+                    <p class="mt-2 text-center text-xs text-gray-400">
+                        © <span id="currentYear"></span> Project Management App.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/login.js"></script>
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Set current year
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Toggle password visibility
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eye-icon');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.setAttribute('data-lucide', 'eye');
+            }
+
+            lucide.createIcons();
+        }
+
+        // Auto-focus email input
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('email').focus();
+        });
+
+        // Form validation
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const emailError = document.getElementById('email-error');
+        const passwordError = document.getElementById('password-error');
+
+        emailInput.addEventListener('blur', () => {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (emailInput.value && !emailRegex.test(emailInput.value)) {
+                emailInput.classList.remove('input-focus');
+                emailInput.classList.add('input-error', 'border-red-300');
+                emailError.classList.remove('hidden');
+                lucide.createIcons();
+            } else {
+                emailInput.classList.remove('input-error', 'border-red-300');
+                emailInput.classList.add('input-focus');
+                emailError.classList.add('hidden');
+            }
+        });
+
+        passwordInput.addEventListener('blur', () => {
+            if (!passwordInput.value) {
+                passwordInput.classList.remove('input-focus');
+                passwordInput.classList.add('input-error', 'border-red-300');
+                passwordError.classList.remove('hidden');
+            } else {
+                passwordInput.classList.remove('input-error', 'border-red-300');
+                passwordInput.classList.add('input-focus');
+                passwordError.classList.add('hidden');
+            }
+        });
+
+        // Clear errors on input
+        emailInput.addEventListener('input', () => {
+            if (!emailError.classList.contains('hidden')) {
+                emailInput.classList.remove('input-error', 'border-red-300');
+                emailInput.classList.add('input-focus');
+                emailError.classList.add('hidden');
+            }
+        });
+
+        passwordInput.addEventListener('input', () => {
+            if (!passwordError.classList.contains('hidden')) {
+                passwordInput.classList.remove('input-error', 'border-red-300');
+                passwordInput.classList.add('input-focus');
+                passwordError.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+
+</html>

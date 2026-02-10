@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+        Project Management App - Detail Project
+    </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .task-hover {
+            transition: all 0.2s ease;
+        }
+
+        .task-hover:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px -4px rgba(0, 0, 0, 0.1);
+        }
+
+        .custom-checkbox {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #d1d5db;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .custom-checkbox:checked {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+        }
+
+        .custom-checkbox:checked::after {
+            content: '✓';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .custom-checkbox:hover {
+            border-color: #3b82f6;
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+    <div id="successToast" class="hidden fixed top-6 left-1/2 -translate-x-1/2 z-50
+           max-w-sm rounded-xl bg-green-600 text-white
+           px-5 py-4 shadow-xl flex items-start gap-3 fade-in">
+        <i data-lucide="check-circle-2" class="w-6 h-6 mt-0.5"></i>
+        <div>
+            <p id="successMessage" class="font-semibold"></p>
+        </div>
+    </div>
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
+        <div class="mb-8 fade-in">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6 mb-6">
+                <div class="flex-1">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="p-2 bg-blue-600 rounded-lg">
+                            <i data-lucide="check-square" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+                                <%= projectName %>
+                            </h1>
+                            <p class="text-sm sm:text-base text-gray-600 mt-1">
+                                Tasks
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-3">
+                    <% if (!isProjectCompleted) { %>
+                        <a href="/projects-page/<%= projectId %>/tasks/create" class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5
+          text-sm font-semibold text-white shadow-lg shadow-blue-600/30
+          transition-all hover:bg-blue-700 active:scale-95">
+                            <i data-lucide="plus"></i>
+                            Task Baru
+                        </a>
+                        <% } %>
+                            <% if (!isProjectCompleted) { %>
+                                <button onclick="confirmCompleteProject()" class="inline-flex items-center gap-2 rounded-lg bg-green-600 px-5 py-2.5
+               text-sm font-semibold text-white shadow-lg
+               transition-all hover:bg-green-700 active:scale-95">
+                                    <i data-lucide="check-circle"></i>
+                                    Selesaikan Projek
+                                </button>
+                                <button onclick="confirmDeleteProject()" class="inline-flex items-center gap-2 rounded-lg bg-red-600 px-5 py-2.5
+           text-sm font-semibold text-white shadow-lg shadow-red-600/30
+           transition-all hover:bg-red-700 active:scale-95">
+                                    <i data-lucide="trash-2"></i>
+                                    Hapus Project
+                                </button>
+                                <% } %>
+                                    <a href="/projects-page"
+                                        class="inline-flex items-center gap-2 rounded-lg bg-white border-2 border-gray-200 px-5 py-2.5 text-sm font-semibold text-gray-700 transition-all hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600 active:scale-95">
+                                        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                                        <span>Kembali ke Projects</span>
+                                    </a>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-blue-100 rounded-lg">
+                            <i data-lucide="list-checks" class="w-5 h-5 text-blue-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-600">Total Tasks</p>
+                            <p id="totalTasks" class="text-xl font-bold text-gray-900">
+                                <%= tasks.length %>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-green-100 rounded-lg">
+                            <i data-lucide="check-circle-2" class="w-5 h-5 text-green-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-600">Selesai</p>
+                            <p id="completedTasks" class="text-xl font-bold text-gray-900">
+                                <%= tasks.filter(t=> t.isCompleted).length %>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-yellow-100 rounded-lg">
+                            <i data-lucide="clock" class="w-5 h-5 text-yellow-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-600">Dalam Proses</p>
+                            <p id="pendingTasks" class="text-xl font-bold text-gray-900">
+                                <%= tasks.filter(t=> !t.isCompleted).length %>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-purple-100 rounded-lg">
+                            <i data-lucide="trending-up" class="w-5 h-5 text-purple-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-600">Progress</p>
+                            <p id="progressCard" class="text-xl font-bold text-gray-900">
+                                <%= tasks.length> 0 ? Math.round((tasks.filter(t => t.isCompleted).length /
+                                    tasks.length) * 100) : 0 %>%
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <% if (tasks.length> 0) { %>
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-semibold text-gray-700">Progress Keseluruhan</span>
+                        <span id="progressText" class="text-sm font-bold text-blue-600">
+                            <%= Math.round((tasks.filter(t=> t.isCompleted).length / tasks.length) * 100) %>%
+                        </span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                        <div id="progressBar"
+                            class="bg-gradient-to-r from-blue-500 to-blue-600 h-full rounded-full transition-all duration-500"
+                            style="width: <%= (tasks.filter(t => t.isCompleted).length / tasks.length) * 100 %>%">
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+        </div>
+
+        <% if (tasks.length===0) { %>
+            <div class="fade-in rounded-2xl border-2 border-dashed border-gray-300 bg-white p-12 sm:p-16 text-center">
+                <div
+                    class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-blue-50 to-blue-100">
+                    <i data-lucide="list-checks" class="w-10 h-10 text-blue-600"></i>
+                </div>
+
+                <h3 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">
+                    Belum ada task
+                </h3>
+                <p class="text-sm sm:text-base text-gray-600 mb-8 max-w-md mx-auto">
+                    Mulai produktivitas Anda dengan menambahkan task pertama untuk project ini
+                </p>
+
+                <a href="/projects-page/<%= projectId %>/tasks/create"
+                    class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/30 transition-all hover:bg-blue-700 hover:shadow-xl active:scale-95">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    <span>Buat Task Pertama</span>
+                </a>
+            </div>
+            <% } else { %>
+
+                <div class="space-y-3 fade-in">
+                    <% tasks.forEach((task, index)=> { %>
+                        <div class="task-hover bg-white rounded-xl shadow-md border p-4 sm:p-5
+<%= isProjectCompleted ? 'pointer-events-none opacity-60' : 'cursor-pointer' %>"
+                            onclick="onTaskCardClick(event, '<%= task.id %>')">
+                            <div class="flex items-start gap-4">
+                                <!-- Checkbox -->
+                                <div class="pt-1">
+                                    <input type="checkbox" class="custom-checkbox" data-ignore-toggle
+                                        <%=task.isCompleted ? 'checked' : '' %>
+                                    <%= isProjectCompleted ? 'disabled' : '' %>
+                                        onchange="toggleTask('<%= task.id %>', this.checked)"
+                                            onclick="event.stopPropagation()"
+                                            />
+                                </div>
+
+                                <!-- Task Content -->
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex flex-col gap-3">
+                                        <!-- Title and Status Row -->
+                                        <div class="flex items-center justify-between gap-2 sm:gap-4 flex-wrap">
+                                            <div class="flex items-center gap-3 min-w-0 flex-1">
+                                                <!-- Task Number -->
+                                                <span
+                                                    class="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 text-xs font-bold text-gray-600">
+                                                    <%= index + 1 %>
+                                                </span>
+
+                                                <!-- Task Title -->
+                                                <label id="title-<%= task.id %>"
+                                                    onclick="toggleDescription('<%= task.id %>')" class="cursor-pointer text-sm sm:text-base font-semibold transition-all
+<%= task.isCompleted ? 'line-through text-gray-400' : 'text-gray-900' %>">
+                                                    <%= task.nama %>
+                                                </label>
+                                            </div>
+
+                                            <!-- Status Badge -->
+                                            <div class="flex items-center gap-2 shrink-0">
+                                                <span id="badge-<%= task.id %>" class="text-xs px-3 py-1.5 rounded-full font-semibold
+    <%= task.isCompleted ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700' %>">
+                                                    <i data-lucide="<%= task.isCompleted ? 'check-circle-2' : 'clock' %>"
+                                                        class="w-3 h-3 inline mr-1"></i>
+                                                    <%= task.isCompleted ? 'Selesai' : 'Dalam Proses' %>
+                                                </span>
+
+                                                <!-- Actions Dropdown -->
+                                                <div class="relative">
+                                                    <button onclick="toggleMenu('<%= task.id %>')" data-ignore-toggle
+                                                        class="p-2 rounded-lg hover:bg-gray-100 transition-colors">
+                                                        <i data-lucide="more-vertical"
+                                                            class="w-4 h-4 text-gray-600"></i>
+                                                    </button>
+
+                                                    <div id="menu-<%= task.id %>"
+                                                        class="hidden absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-10">
+
+                                                        <% if (!task.isCompleted) { %>
+                                                            <a id="edit-<%= task.id %>"
+                                                                href="/projects-page/<%= projectId %>/tasks/<%= task.id %>/edit"
+                                                                class="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                                                <i data-lucide="edit" class="w-4 h-4"></i>
+                                                                Edit
+                                                            </a>
+                                                            <% } %>
+
+                                                                <button
+                                                                    onclick="confirmDelete('<%= task.id %>', '<%= task.nama %>')"
+                                                                    data-ignore-toggle
+                                                                    class="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                                                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                                                    Hapus
+                                                                </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div id="desc-wrap-<%= task.id %>"
+                                            class="ml-11 overflow-hidden transition-all duration-300 max-h-0 opacity-0">
+
+                                            <div class="flex items-start gap-2 pt-2">
+                                                <i data-lucide="file-text" class="w-4 h-4 mt-0.5 shrink-0
+           <%= task.deskripsi ? 'text-gray-400' : 'text-gray-300' %>"></i>
+
+                                                <p id="desc-<%= task.id %>" class="text-sm italic
+           <%= task.deskripsi
+                ? (task.isCompleted ? 'line-through text-gray-400' : 'text-gray-600')
+                : 'text-gray-400' %>">
+
+                                                    <%= task.deskripsi || 'Belum ada deskripsi untuk task ini' %>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <% }) %>
+                </div>
+
+                <% } %>
+    </div>
+
+    <!-- Delete Confirmation -->
+    <div id="deleteModal" class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4 z-50">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="p-2 bg-red-100 rounded-lg">
+                    <i data-lucide="alert-triangle" class="w-6 h-6 text-red-600"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">Konfirmasi Hapus</h3>
+            </div>
+
+            <p class="text-sm text-gray-600 mb-6">
+                Apakah Anda yakin ingin menghapus task "<span id="taskTitle" class="font-semibold"></span>"? Tindakan
+                ini tidak dapat dibatalkan.
+            </p>
+
+            <div class="flex gap-3">
+                <button onclick="closeDeleteModal()"
+                    class="flex-1 rounded-lg bg-gray-100 px-4 py-2.5 text-sm font-semibold text-gray-700 transition-all hover:bg-gray-200 active:scale-95">
+                    Batal
+                </button>
+                <button onclick="deleteTaskConfirmed()" class="flex-1 rounded-lg bg-red-600 px-4 py-2.5
+           text-sm font-semibold text-white transition-all
+           hover:bg-red-700 active:scale-95">
+                    Hapus
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="completeProjectModal"
+        class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4 z-50">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <div class="flex items-center gap-3 mb-4">
+                <div id="completeIcon" class="p-2 rounded-lg">
+                    <i id="completeIconSvg" data-lucide="check-circle"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900" id="completeTitle">
+                    Konfirmasi
+                </h3>
+            </div>
+
+            <p id="completeMessage" class="text-sm text-gray-600 mb-6"></p>
+
+            <div class="flex gap-3">
+                <button onclick="closeCompleteModal()"
+                    class="flex-1 rounded-lg bg-gray-100 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-200">
+                    Batal
+                </button>
+
+                <button onclick="submitCompleteProject()"
+                    class="flex-1 rounded-lg bg-green-600 px-4 py-2.5 text-sm font-semibold text-white">
+                    Selesaikan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteProjectModal"
+        class="hidden fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4 z-50">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="p-2 bg-red-100 rounded-lg">
+                    <i data-lucide="alert-triangle" class="w-6 h-6 text-red-600"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">
+                    Hapus Project
+                </h3>
+            </div>
+
+            <p class="text-sm text-gray-600 mb-6">
+                Apakah Anda yakin ingin menghapus project
+                <span class="font-semibold">"<%= projectName %>"</span>?
+                <br><br>
+                <b>Semua task di dalamnya juga akan terhapus</b>.
+                Tindakan ini tidak dapat dibatalkan.
+            </p>
+
+            <div class="flex gap-3">
+                <button onclick="closeDeleteProjectModal()" class="flex-1 rounded-lg bg-gray-100 px-4 py-2.5
+                       text-sm font-semibold text-gray-700 hover:bg-gray-200">
+                    Batal
+                </button>
+
+                <button onclick="deleteProject()"
+                    class="flex-1 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white">
+                    Hapus Project
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+        });
+
+        function toggleTask(taskId, isCompleted) {
+            const endpoint = isCompleted
+                ? `/projects/<%= projectId %>/tasks/${taskId}/complete`
+                : `/projects/<%= projectId %>/tasks/${taskId}/uncomplete`;
+
+            fetch(endpoint, {
+                method: 'PATCH',
+            })
+                .then(res => {
+                    if (!res.ok) throw new Error();
+
+                    const title = document.getElementById(`title-${taskId}`);
+                    const desc = document.getElementById(`desc-${taskId}`);
+                    const badge = document.getElementById(`badge-${taskId}`);
+                    const menu = document.getElementById(`menu-${taskId}`);
+
+                    title.classList.toggle('line-through', isCompleted);
+                    title.classList.toggle('text-gray-400', isCompleted);
+                    title.classList.toggle('text-gray-900', !isCompleted);
+
+                    if (desc) {
+                        desc.classList.toggle('line-through', isCompleted);
+                        desc.classList.toggle('text-gray-400', isCompleted);
+                    }
+
+                    badge.className = isCompleted
+                        ? 'text-xs px-3 py-1.5 rounded-full font-semibold bg-green-100 text-green-700'
+                        : 'text-xs px-3 py-1.5 rounded-full font-semibold bg-yellow-100 text-yellow-700';
+
+                    badge.innerHTML = `
+                <i data-lucide="${isCompleted ? 'check-circle-2' : 'clock'}"
+                   class="w-3 h-3 inline mr-1"></i>
+                ${isCompleted ? 'Selesai' : 'Dalam Proses'}
+            `;
+
+                    const editBtn = document.getElementById(`edit-${taskId}`);
+
+                    if (isCompleted && editBtn) {
+                        editBtn.remove();
+                    }
+
+                    if (!isCompleted && !editBtn) {
+                        const deleteBtn = menu.querySelector('button');
+
+                        const editLink = document.createElement('a');
+                        editLink.id = `edit-${taskId}`;
+                        editLink.href = `/projects-page/<%= projectId %>/tasks/${taskId}/edit`;
+                        editLink.className =
+                            'flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50';
+                        editLink.innerHTML = `
+                    <i data-lucide="edit" class="w-4 h-4"></i>
+                    Edit
+                `;
+
+                        menu.insertBefore(editLink, deleteBtn);
+                    }
+
+                    updateStats(isCompleted);
+                })
+                .catch(() => alert('Gagal update task'));
+        }
+
+        function updateStats(isCompleted) {
+            const total = +document.getElementById('totalTasks').textContent;
+            const completedEl = document.getElementById('completedTasks');
+            const pendingEl = document.getElementById('pendingTasks');
+
+            let completed = +completedEl.textContent;
+            completed += isCompleted ? 1 : -1;
+
+            completedEl.textContent = completed;
+            pendingEl.textContent = total - completed;
+
+            const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+            document.getElementById('progressText').textContent = `${percent}%`;
+            document.getElementById('progressBar').style.width = `${percent}%`;
+            document.getElementById('progressCard').textContent = `${percent}%`;
+        }
+
+        function toggleMenu(taskId) {
+            const menu = document.getElementById(`menu-${taskId}`);
+            const allMenus = document.querySelectorAll('[id^="menu-"]');
+
+            allMenus.forEach(m => {
+                if (m !== menu) m.classList.add('hidden');
+            });
+
+            menu.classList.toggle('hidden');
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('[onclick^="toggleMenu"]') &&
+                !e.target.closest('[id^="menu-"]')) {
+                document.querySelectorAll('[id^="menu-"]').forEach(m => {
+                    m.classList.add('hidden');
+                });
+            }
+        });
+
+        let TASK_ID_TO_DELETE = null;
+
+        function confirmDelete(taskId, taskTitle) {
+            TASK_ID_TO_DELETE = taskId;
+            document.getElementById('taskTitle').textContent = taskTitle;
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+
+        async function deleteTaskConfirmed() {
+            if (!TASK_ID_TO_DELETE) return;
+
+            try {
+                const res = await fetch(
+                    `/projects/<%= projectId %>/tasks/${TASK_ID_TO_DELETE}`,
+                    { method: 'DELETE' }
+                );
+
+                if (!res.ok) throw new Error();
+
+                // redirect + toast
+                window.location.href =
+                    `/projects-page/<%= projectId %>/tasks?success=task_deleted`;
+
+            } catch (err) {
+                alert('Gagal menghapus task');
+            }
+        }
+
+        function closeDeleteModal() {
+            TASK_ID_TO_DELETE = null;
+            document.getElementById('deleteModal').classList.add('hidden');
+        }
+
+        function toggleDescription(taskId) {
+            const wrap = document.getElementById(`desc-wrap-${taskId}`);
+            if (!wrap) return;
+
+            const isOpen = wrap.classList.contains('max-h-40');
+
+            if (isOpen) {
+                wrap.classList.remove('max-h-40', 'opacity-100');
+                wrap.classList.add('max-h-0', 'opacity-0');
+            } else {
+                wrap.classList.remove('max-h-0', 'opacity-0');
+                wrap.classList.add('max-h-40', 'opacity-100');
+            }
+        }
+
+        function onTaskCardClick(event, taskId) {
+            if (event.target.closest('[data-ignore-toggle]')) {
+                return;
+            }
+
+            toggleDescription(taskId);
+        }
+
+        function confirmCompleteProject() {
+            const total = Number(document.getElementById('totalTasks').textContent);
+            const completed = Number(document.getElementById('completedTasks').textContent);
+            const unfinished = total - completed;
+
+            const modal = document.getElementById('completeProjectModal');
+            const msg = document.getElementById('completeMessage');
+            const iconWrap = document.getElementById('completeIcon');
+            const icon = document.getElementById('completeIconSvg');
+
+            // RESET icon dulu (penting biar lucide kebaca)
+            icon.removeAttribute('data-lucide');
+
+            if (unfinished > 0) {
+                iconWrap.className = 'p-2 bg-yellow-100 rounded-lg';
+                icon.setAttribute('data-lucide', 'alert-triangle');
+
+                msg.innerHTML = `
+      Masih terdapat <b>${unfinished}</b> task yang belum selesai.
+      <br><br>
+      Apakah Anda yakin ingin tetap menyelesaikan project ini?
+    `;
+            } else {
+                iconWrap.className = 'p-2 bg-green-100 rounded-lg';
+                icon.setAttribute('data-lucide', 'check-circle-2');
+
+                msg.textContent = 'Semua task sudah selesai. Selesaikan project ini?';
+            }
+
+            // re-render icon
+            lucide.createIcons();
+
+            modal.classList.remove('hidden');
+        }
+
+        async function submitCompleteProject() {
+            try {
+                const res = await fetch('/projects/<%= projectId %>/complete', {
+                    method: 'PATCH',
+                });
+
+                if (!res.ok) throw new Error();
+
+                closeCompleteModal();
+
+                const url = new URL(window.location);
+                url.searchParams.set('success', 'project_completed');
+                window.location.href = url.toString();
+
+
+            } catch (err) {
+                alert('Gagal menyelesaikan project');
+            }
+        }
+
+        function closeCompleteModal() {
+            document.getElementById('completeProjectModal').classList.add('hidden');
+        }
+        const IS_PROJECT_COMPLETED = <%= isProjectCompleted ? 'true' : 'false' %>;
+
+        const successMessages = {
+            project_created: 'Project berhasil dibuat',
+            project_updated: 'Project berhasil diperbarui',
+            project_deleted: 'Project berhasil dihapus',
+            project_completed: 'Project berhasil diselesaikan',
+            task_created: 'Task berhasil ditambahkan',
+            task_updated: 'Task berhasil diperbarui',
+            task_deleted: 'Task berhasil dihapus 🗑️',
+        };
+
+        const params = new URLSearchParams(window.location.search);
+        const successKey = params.get('success');
+
+        if (successKey && successMessages[successKey]) {
+            const toast = document.getElementById('successToast');
+            const msg = document.getElementById('successMessage');
+
+            msg.textContent = successMessages[successKey];
+            toast.classList.remove('hidden');
+
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+
+            const url = new URL(window.location);
+            url.searchParams.delete('success');
+            window.history.replaceState({}, '', url);
+
+        }
+
+        function deleteProject() {
+            fetch('/projects/<%= projectId %>', {
+                method: 'DELETE',
+            }).then(() => {
+                window.location.href = '/projects-page?success=project_deleted';
+            });
+        }
+
+        function confirmDeleteProject() {
+            document.getElementById('deleteProjectModal')
+                .classList.remove('hidden');
+        }
+
+        function closeDeleteProjectModal() {
+            document.getElementById('deleteProjectModal')
+                .classList.add('hidden');
+        }
+
+        function deleteTask(taskId) {
+            fetch(`/projects/<%= projectId %>/tasks/${taskId}`, {
+                method: 'DELETE',
+            }).then(() => {
+                window.location.reload();
+            });
+        }
+    </script>
+</body>
+
+</html>

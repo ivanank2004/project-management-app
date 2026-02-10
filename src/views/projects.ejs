@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Projects - Project Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .card-hover {
+            transition: all 0.2s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.15);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .page-btn-active {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: #fff;
+            border-color: transparent;
+            box-shadow: 0 4px 10px -2px rgba(59, 130, 246, .35);
+        }
+
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-menu {
+            z-index: 1;
+            position: absolute;
+            left: 0;
+            top: 100%;
+        }
+    </style>
+</head>
+
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+    <!-- Success Toast -->
+    <div id="successToast" class="hidden fixed top-6 left-1/2 -translate-x-1/2 z-50
+           max-w-sm rounded-xl bg-green-600 text-white
+           px-5 py-4 shadow-xl flex items-start gap-3 fade-in">
+        <i data-lucide="check-circle-2" class="w-6 h-6 mt-0.5"></i>
+        <div>
+            <p id="successMessage" class="font-semibold"></p>
+        </div>
+    </div>
+
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
+
+        <!-- Header -->
+        <div class="mb-8 fade-in">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-6 mb-6">
+                <div>
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="p-2 bg-blue-600 rounded-lg">
+                            <i data-lucide="folder" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Projects</h1>
+                    </div>
+                    <p class="text-sm sm:text-base text-gray-600 ml-14">Kelola dan pantau semua project Anda</p>
+                </div>
+
+                <div class="flex flex-wrap gap-3">
+                    <a href="/projects-page/create"
+                        class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-blue-600/30 transition-all hover:bg-blue-700 hover:shadow-xl hover:shadow-blue-600/40 active:scale-95">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        <span>Project Baru</span>
+                    </a>
+                    <button onclick="logout()"
+                        class="inline-flex items-center gap-2 rounded-lg bg-white border-2 border-gray-200 px-5 py-2.5 text-sm font-semibold text-gray-700 transition-all hover:border-red-200 hover:bg-red-50 hover:text-red-600 active:scale-95">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                        <span>Logout</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-blue-100 rounded-lg">
+                            <i data-lucide="folder" class="w-5 h-5 text-blue-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-600">Total Projects</p>
+                            <p class="text-xl font-bold text-gray-900" id="totalProjects">0</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-amber-100 rounded-lg">
+                            <i data-lucide="timer" class="w-5 h-5 text-amber-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-600">Dalam Proses</p>
+                            <p class="text-xl font-bold text-gray-900" id="inProgressProjects">0</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-green-100 rounded-lg">
+                            <i data-lucide="check-circle-2" class="w-5 h-5 text-green-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-600">Project Selesai</p>
+                            <p class="text-xl font-bold text-gray-900" id="completedProjects">0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search + Controls -->
+        <div class="mb-6 fade-in" id="searchSection">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+                <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                    <!-- Search input -->
+                    <div class="relative flex-1 w-full">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i data-lucide="search" class="w-5 h-5 text-gray-400"></i>
+                        </div>
+                        <input type="text" id="searchInput"
+                            placeholder="Cari project berdasarkan nama atau deskripsi..."
+                            class="search-input w-full rounded-lg border-2 border-gray-200 pl-10 pr-10 py-3 text-sm transition-all hover:border-gray-300" />
+                        <button id="clearSearch"
+                            class="hidden absolute inset-y-0 right-0 pr-3 items-center text-gray-400 hover:text-gray-600 transition-colors">
+                            <i data-lucide="x-circle" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+
+                    <!-- Reset button -->
+                    <button id="resetBtn"
+                        class="inline-flex items-center justify-center gap-2 rounded-lg bg-gray-100 px-4 py-3 text-sm font-semibold text-gray-700 transition-all hover:bg-gray-200 active:scale-95 flex-shrink-0">
+                        <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                        <span>Reset</span>
+                    </button>
+
+                    <!-- Show-per-page -->
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                        <span class="text-sm text-gray-600 whitespace-nowrap">Tampilkan</span>
+                        <div class="relative">
+                            <select id="perPageSelect"
+                                class="appearance-none rounded-lg border-2 border-gray-200 bg-white pl-3 pr-8 py-3 text-sm font-semibold text-gray-700 cursor-pointer transition-all hover:border-gray-300 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="all">Semua</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 pr-2 flex items-center">
+                                <i data-lucide="chevron-down" class="w-4 h-4 text-gray-500"></i>
+                            </div>
+                        </div>
+                        <span class="text-sm text-gray-600 whitespace-nowrap">per halaman</span>
+                    </div>
+                </div>
+
+                <!-- Search info -->
+                <div id="searchInfo" class="hidden mt-3 pt-3 border-t border-gray-100">
+                    <div class="flex items-center gap-2 text-sm">
+                        <i data-lucide="info" class="w-4 h-4 text-blue-600"></i>
+                        <span class="text-gray-600">
+                            Menampilkan <span id="resultCount" class="font-semibold text-gray-900">0</span>
+                            dari <span id="totalCount" class="font-semibold text-gray-900">0</span> project
+                        </span>
+                    </div>
+                </div>
+                <div id="noResults" class="hidden mt-3 pt-3 border-t border-gray-100">
+                    <div class="flex items-center gap-2 text-sm text-amber-600">
+                        <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                        <span>Tidak ada project yang cocok dengan pencarian Anda</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty state -->
+        <div id="emptyState"
+            class="hidden fade-in rounded-2xl border-2 border-dashed border-gray-300 bg-white p-12 sm:p-16 text-center">
+            <div
+                class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-blue-50 to-blue-100">
+                <i data-lucide="folder-open" class="w-10 h-10 text-blue-600"></i>
+            </div>
+            <h3 class="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Belum ada project</h3>
+            <p class="text-sm sm:text-base text-gray-600 mb-8 max-w-md mx-auto">
+                Mulai project pertama Anda
+            </p>
+            <a href="/projects-page/create"
+                class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/30 transition-all hover:bg-blue-700 hover:shadow-xl active:scale-95">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span>Buat Project Pertama</span>
+            </a>
+        </div>
+
+        <!-- Desktop Table -->
+        <div id="desktopTable"
+            class="hidden lg:block fade-in rounded-xl bg-white shadow-lg border border-gray-100 overflow-visible">
+            <table class="w-full">
+                <thead class="bg-gradient-to-r from-gray-50 to-gray-100">
+                    <tr>
+                        <th onclick="sortTable(0,'number')"
+                            class="cursor-pointer px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider select-none hover:bg-gray-100 transition-colors">
+                            No <span id="sort-0" class="ml-1 inline-block">↕</span>
+                        </th>
+                        <th onclick="sortTable(1,'string')"
+                            class="cursor-pointer px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider select-none hover:bg-gray-100 transition-colors">
+                            Nama Project <span id="sort-1" class="ml-1 inline-block">↕</span>
+                        </th>
+                        <th onclick="sortTable(2,'string')"
+                            class="cursor-pointer px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider select-none hover:bg-gray-100 transition-colors">
+                            Deskripsi <span id="sort-2" class="ml-1 inline-block">↕</span>
+                        </th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Status</th>
+                        <th class="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100" id="tableBody"></tbody>
+            </table>
+        </div>
+
+        <!-- Mobile cards -->
+        <div id="mobileList" class="block lg:hidden space-y-4 fade-in"></div>
+
+        <!-- Pagination -->
+        <div id="paginationWrapper" class="hidden mt-6 fade-in">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 px-4 py-3">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <p class="text-sm text-gray-600" id="pageInfo">
+                        Menampilkan <span class="font-semibold text-gray-900" id="pageFrom">1</span>–<span
+                            class="font-semibold text-gray-900" id="pageTo">10</span>
+                        dari <span class="font-semibold text-gray-900" id="pageTotal">0</span> project
+                    </p>
+                    <div class="flex items-center gap-1" id="pageButtons"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Modal -->
+    <div id="deleteModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="p-2 bg-red-100 rounded-lg">
+                    <i data-lucide="alert-triangle" class="w-6 h-6 text-red-600"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">Konfirmasi Hapus</h3>
+            </div>
+            <p class="text-sm text-gray-600 mb-6">
+                Apakah Anda yakin ingin menghapus project "<span id="deleteProjectName" class="font-semibold"></span>"?
+                Tindakan ini tidak dapat dibatalkan.
+            </p>
+            <div class="flex gap-3">
+                <button onclick="closeDeleteModal()"
+                    class="flex-1 rounded-lg bg-gray-100 px-4 py-2.5 text-sm font-semibold text-gray-700 transition-all hover:bg-gray-200 active:scale-95">
+                    Batal
+                </button>
+                <button id="confirmDelete"
+                    class="flex-1 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white transition-all hover:bg-red-700 active:scale-95">
+                    Hapus
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        let allProjects = [];
+        let filtered = [];
+        let currentPage = 1;
+        let perPage = 10;
+        let sortState = {};
+
+        async function logout() {
+            try {
+                const res = await fetch('/auth/logout', {
+                    method: 'POST',
+                    credentials: 'include',
+                });
+
+                const json = await res.json();
+
+                if (json.status === 'success') {
+                    window.location.href = '/login';
+                } else {
+                    showToast(json.message || 'Gagal logout', 'error');
+                }
+            } catch (error) {
+                console.error(error);
+                showToast('Gagal logout', 'error');
+            }
+        }
+
+        // Load projects
+        async function loadProjects() {
+            try {
+                const res = await fetch('/projects');
+                const json = await res.json();
+                allProjects = json.data || [];
+                filtered = [...allProjects];
+
+                updateStats();
+                render();
+            } catch (error) {
+                console.error('Error loading projects:', error);
+                showToast('Gagal memuat data project', 'error');
+            }
+        }
+
+        // Update stats
+        function updateStats() {
+            const total = allProjects.length;
+            const completed = allProjects.filter(p => p.isCompleted).length;
+            const inProgress = total - completed;
+
+            document.getElementById('totalProjects').textContent = total;
+            document.getElementById('completedProjects').textContent = completed;
+            document.getElementById('inProgressProjects').textContent = inProgress;
+
+            // Show/hide sections based on whether there are projects
+            const isEmpty = total === 0;
+            document.getElementById('emptyState').classList.toggle('hidden', !isEmpty);
+            document.getElementById('searchSection').classList.toggle('hidden', isEmpty);
+
+            // Don't toggle desktop/mobile here - let render() handle it
+        }
+
+        // Helper to escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Render
+        function render() {
+            const total = filtered.length;
+            const isAll = perPage === 'all';
+            const pageCount = isAll ? 1 : Math.ceil(total / perPage);
+
+            if (currentPage > pageCount) currentPage = Math.max(1, pageCount);
+
+            const start = isAll ? 0 : (currentPage - 1) * perPage;
+            const end = isAll ? total : Math.min(start + perPage, total);
+
+            const visible = filtered.slice(start, end);
+
+            const desktopTable = document.getElementById('desktopTable');
+            const mobileList = document.getElementById('mobileList');
+
+            if (total === 0) {
+                desktopTable.classList.add('hidden');
+                mobileList.classList.add('hidden');
+            }
+            else {
+                renderDesktopTable(visible, start);
+                renderMobileCards(visible);
+            }
+
+            updatePaginationBar(total, start, end, pageCount);
+            updateSearchInfo();
+            lucide.createIcons();
+        }
+
+        function renderDesktopTable(visible, start) {
+            const tableBody = document.getElementById('tableBody');
+            tableBody.innerHTML = '';
+
+            visible.forEach((project, idx) => {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50 transition-colors cursor-pointer';
+                row.onclick = () => viewProject(project.id);
+
+                row.innerHTML = `
+                    <td class="px-6 py-4">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-md bg-gray-100 text-xs font-mono font-semibold text-gray-700">
+                            ${start + idx + 1}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-blue-50 rounded-lg">
+                                <i data-lucide="folder" class="w-4 h-4 text-blue-600"></i>
+                            </div>
+                            <span class="font-semibold text-gray-900">${escapeHtml(project.nama)}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <p class="text-sm text-gray-600 max-w-md truncate">${escapeHtml(project.deskripsi || 'Tidak ada deskripsi')}</p>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="text-xs px-3 py-1.5 rounded-full font-semibold ${project.isCompleted ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">
+                            <i data-lucide="${project.isCompleted ? 'check-circle-2' : 'clock'}" class="w-3 h-3 inline mr-1"></i>
+                            ${project.isCompleted ? 'Selesai' : 'Proses'}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <div class="flex items-center justify-end gap-2">
+                            ${createActionButtons(project)}
+                        </div>
+                    </td>
+                `;
+
+                tableBody.appendChild(row);
+            });
+        }
+
+        function renderMobileCards(visible) {
+            const mobileList = document.getElementById('mobileList');
+            mobileList.innerHTML = '';
+
+            visible.forEach(project => {
+                const card = document.createElement('div');
+                card.className = 'card-hover bg-white rounded-xl shadow-md border border-gray-100 p-5 cursor-pointer';
+                card.onclick = () => viewProject(project.id);
+
+                card.innerHTML = `
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-3 flex-1 min-w-0">
+                            <div class="p-2 bg-blue-50 rounded-lg shrink-0">
+                                <i data-lucide="folder" class="w-5 h-5 text-blue-600"></i>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <h3 class="font-semibold text-gray-900 truncate">${escapeHtml(project.nama)}</h3>
+                                <div class="flex flex-wrap gap-1.5 mt-1">
+                                    <span class="inline-flex items-center text-xs px-3 py-1 rounded-full font-semibold ${project.isCompleted ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">
+                                        <i data-lucide="${project.isCompleted ? 'check-circle-2' : 'clock'}" class="w-3 h-3 mr-1"></i>
+                                        ${project.isCompleted ? 'Selesai' : 'Dalam Proses'}
+                                    </span>
+                                    <span class="inline-block px-2 py-1 rounded bg-gray-100 text-xs font-mono font-semibold text-gray-700">
+                                        #${project.id}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-4 line-clamp-2">${escapeHtml(project.deskripsi || 'Tidak ada deskripsi')}</p>
+                    <div class="flex flex-wrap gap-2">
+                        ${createMobileActionButtons(project)}
+                    </div>
+                `;
+
+                mobileList.appendChild(card);
+            });
+        }
+
+        function createActionButtons(project) {
+            return `
+        <div class="dropdown">
+            <button onclick="event.stopPropagation(); toggleMenu(this)"
+                class="p-2 rounded-lg hover:bg-gray-100 transition">
+                <i data-lucide="more-vertical" class="w-5 h-5"></i>
+            </button>
+
+            <div class="dropdown-menu hidden w-40 bg-white border border-gray-200 rounded-lg shadow-lg py-1 text-left">
+
+                ${!project.isCompleted ? `
+                    <a href="/projects-page/${project.id}/edit"
+                       onclick="event.stopPropagation()"
+                       class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                        Edit
+                    </a>
+                ` : ''}
+
+                ${!project.isCompleted ? `
+                    <button onclick="event.stopPropagation(); completeProject(${project.id})"
+                        class="w-full text-left px-4 py-2 text-sm text-green-600 hover:bg-green-50">
+                        Selesaikan
+                    </button>
+                ` : `
+                    <button onclick="event.stopPropagation(); uncompleteProject(${project.id})"
+                        class="w-full text-left px-4 py-2 text-sm text-yellow-600 hover:bg-yellow-50">
+                        Batalkan
+                    </button>
+                `}
+
+                <button onclick="event.stopPropagation(); confirmDeleteProject(${project.id}, '${escapeHtml(project.nama).replace(/'/g, "\\'")}')"
+                    class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50">
+                    Hapus
+                </button>
+            </div>
+        </div>
+    `;
+        }
+
+        function createMobileActionButtons(project) {
+            const buttons = [];
+
+            if (!project.isCompleted) {
+                buttons.push(`
+                    <button onclick="event.stopPropagation(); completeProject(${project.id})"
+                        class="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-green-50 px-4 py-2.5 text-xs font-semibold text-green-600 transition-all hover:bg-green-100 active:scale-95">
+                        <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>Selesai
+                    </button>
+                `);
+            } else {
+                buttons.push(`
+                    <button onclick="event.stopPropagation(); uncompleteProject(${project.id})"
+                        class="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-yellow-50 px-4 py-2.5 text-xs font-semibold text-yellow-600 transition-all hover:bg-yellow-100 active:scale-95">
+                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>Batalkan
+                    </button>
+                `);
+            }
+
+            buttons.push(`
+                <a href="/projects/${project.id}/edit"
+       onclick="event.stopPropagation()"
+       class="flex-1 inline-flex items-center justify-center gap-1.5 rounded-lg bg-blue-50 px-4 py-2.5 text-xs font-semibold text-blue-600 hover:bg-blue-100">
+        <i data-lucide="edit" class="w-3.5 h-3.5"></i>Edit
+    </a>
+            `);
+
+            buttons.push(`
+                <button onclick="event.stopPropagation(); confirmDeleteProject(${project.id}, '${escapeHtml(project.nama).replace(/'/g, "\\'")}')"
+                    class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-red-50 px-4 py-2.5 text-xs font-semibold text-red-600 transition-all hover:bg-red-100 active:scale-95">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                </button>
+            `);
+
+            return buttons.join('');
+        }
+
+        function toggleMenu(btn) {
+            const menu = btn.nextElementSibling;
+            const isOpen = !menu.classList.contains('hidden');
+
+            document.querySelectorAll('.dropdown-menu')
+                .forEach(m => m.classList.add('hidden'));
+
+            if (!isOpen) {
+                menu.classList.remove('hidden');
+            }
+        }
+
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.dropdown')) return;
+
+            document.querySelectorAll('.dropdown-menu')
+                .forEach(m => m.classList.add('hidden'));
+        });
+
+
+        function updatePaginationBar(total, start, end, pageCount) {
+            const wrapper = document.getElementById('paginationWrapper');
+            wrapper.style.display = total === 0 ? 'none' : '';
+
+            document.getElementById('pageFrom').textContent = total === 0 ? 0 : start + 1;
+            document.getElementById('pageTo').textContent = end;
+            document.getElementById('pageTotal').textContent = total;
+
+            const container = document.getElementById('pageButtons');
+            container.innerHTML = '';
+
+            if (pageCount <= 1) return;
+
+            const btn = (label, page, disabled, active) => {
+                const b = document.createElement('button');
+                b.innerHTML = label;
+                b.disabled = disabled;
+                b.className = [
+                    'min-w-[36px] h-9 px-2 rounded-lg border-2 text-sm font-semibold transition-all active:scale-95',
+                    active ? 'page-btn-active border-transparent'
+                        : 'border-gray-200 bg-white text-gray-700 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600',
+                    disabled ? 'opacity-40 cursor-not-allowed pointer-events-none' : '',
+                ].join(' ');
+                if (!disabled && !active) b.onclick = () => { currentPage = page; render(); };
+                return b;
+            };
+
+            container.appendChild(btn('<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>', currentPage - 1, currentPage === 1, false));
+
+            const pages = buildPageRange(currentPage, pageCount);
+            pages.forEach(p => {
+                if (p === '…') {
+                    const s = document.createElement('span');
+                    s.textContent = '…';
+                    s.className = 'px-1 text-gray-400 text-sm select-none';
+                    container.appendChild(s);
+                } else {
+                    container.appendChild(btn(p, p, false, p === currentPage));
+                }
+            });
+
+            container.appendChild(btn('<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 inline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>', currentPage + 1, currentPage === pageCount, false));
+        }
+
+        function buildPageRange(current, total) {
+            if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+            if (current <= 4) return [1, 2, 3, 4, 5, '…', total];
+            if (current >= total - 3) return [1, '…', total - 4, total - 3, total - 2, total - 1, total];
+            return [1, '…', current - 1, current, current + 1, '…', total];
+        }
+
+        // Search
+        function updateSearchInfo() {
+            const keyword = document.getElementById('searchInput').value.trim();
+            const total = filtered.length;
+
+            if (keyword) {
+                document.getElementById('searchInfo').classList.remove('hidden');
+                document.getElementById('resultCount').textContent = total;
+                document.getElementById('totalCount').textContent = allProjects.length;
+                document.getElementById('noResults').classList.toggle('hidden', total > 0);
+            } else {
+                document.getElementById('searchInfo').classList.add('hidden');
+                document.getElementById('noResults').classList.add('hidden');
+            }
+        }
+
+        function performSearch() {
+            const keyword = document.getElementById('searchInput').value.toLowerCase().trim();
+            const clearBtn = document.getElementById('clearSearch');
+
+            if (keyword) {
+                clearBtn.classList.remove('hidden');
+                clearBtn.classList.add('flex');
+                filtered = allProjects.filter(p =>
+                    p.nama.toLowerCase().includes(keyword) ||
+                    (p.deskripsi || '').toLowerCase().includes(keyword)
+                );
+            } else {
+                clearBtn.classList.add('hidden');
+                clearBtn.classList.remove('flex');
+                filtered = [...allProjects];
+            }
+
+            currentPage = 1;
+            render();
+        }
+
+        document.getElementById('searchInput').addEventListener('input', performSearch);
+        document.getElementById('clearSearch').addEventListener('click', () => {
+            document.getElementById('searchInput').value = '';
+            performSearch();
+            document.getElementById('searchInput').focus();
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            document.getElementById('searchInput').value = '';
+            performSearch();
+            sortState = {};
+            document.querySelectorAll("[id^='sort-']").forEach(el => el.textContent = '↕');
+            document.getElementById('searchInput').focus();
+        });
+
+        document.getElementById('perPageSelect').addEventListener('change', (e) => {
+            perPage = e.target.value === 'all' ? 'all' : +e.target.value;
+            currentPage = 1;
+            render();
+        });
+
+        function sortTable(colIndex, type) {
+            const direction = sortState[colIndex] === 'asc' ? 'desc' : 'asc';
+            sortState = { [colIndex]: direction };
+
+            const keys = ['id', 'nama', 'deskripsi'];
+            const key = keys[colIndex];
+
+            filtered.sort((a, b) => {
+                let av = a[key], bv = b[key];
+                if (type === 'number') { av = +av; bv = +bv; }
+                else { av = String(av || '').toLowerCase(); bv = String(bv || '').toLowerCase(); }
+                if (av < bv) return direction === 'asc' ? -1 : 1;
+                if (av > bv) return direction === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            document.querySelectorAll("[id^='sort-']").forEach(el => el.textContent = '↕');
+            document.getElementById(`sort-${colIndex}`).textContent = direction === 'asc' ? '↑' : '↓';
+
+            render();
+        }
+
+        function confirmDeleteProject(id, name) {
+            document.getElementById('deleteProjectName').textContent = name;
+            document.getElementById('confirmDelete').onclick = () => deleteProject(id);
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+        }
+
+        async function completeProject(id) {
+            try {
+                const res = await fetch(`/projects/${id}/complete`, { method: 'PATCH' });
+                const json = await res.json();
+                if (json.status === 'success') {
+                    showToast('Project berhasil diselesaikan');
+                    loadProjects();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Terjadi kesalahan', 'error');
+            }
+        }
+
+        async function uncompleteProject(id) {
+            try {
+                const res = await fetch(`/projects/${id}/uncomplete`, { method: 'PATCH' });
+                const json = await res.json();
+                if (json.status === 'success') {
+                    showToast('Status project dikembalikan');
+                    loadProjects();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Terjadi kesalahan', 'error');
+            }
+        }
+
+        async function deleteProject(id) {
+            try {
+                const res = await fetch(`/projects/${id}`, { method: 'DELETE' });
+                const json = await res.json();
+                if (json.status === 'success') {
+                    showToast('Project berhasil dihapus');
+                    closeDeleteModal();
+                    loadProjects();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showToast('Terjadi kesalahan', 'error');
+            }
+        }
+
+        function viewProject(id) {
+            window.location.href = `/projects-page/${id}/tasks`;
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('successToast');
+            const msg = document.getElementById('successMessage');
+
+            if (type === 'success') {
+                toast.classList.remove('bg-red-600');
+                toast.classList.add('bg-green-600');
+            } else {
+                toast.classList.remove('bg-green-600');
+                toast.classList.add('bg-red-600');
+            }
+
+            msg.textContent = message;
+            toast.classList.remove('hidden');
+
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+
+            lucide.createIcons();
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeDeleteModal();
+            }
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                document.getElementById('searchInput').focus();
+            }
+        });
+
+        document.getElementById('deleteModal').addEventListener('click', (e) => {
+            if (e.target.id === 'deleteModal') closeDeleteModal();
+        });
+
+        // Initial load
+        loadProjects();
+    </script>
+</body>
+
+</html>

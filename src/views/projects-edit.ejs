@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+        <%= title %>
+    </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .input-focus:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .btn-gradient {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-gradient:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            transform: translateY(-1px);
+        }
+
+        .btn-gradient:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+
+<body class="bg-linear-to-br from-gray-50 to-gray-100 min-h-screen">
+
+    <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12">
+
+        <!-- Header Section -->
+        <div class="mb-8 fade-in">
+            <div class="flex items-center gap-3 mb-6">
+                <a href="<%= backUrl %>"
+                    class="p-2 rounded-lg bg-white border-2 border-gray-200 hover:border-blue-200 hover:bg-blue-50 transition-all">
+                    <i data-lucide="arrow-left" class="w-5 h-5 text-gray-600"></i>
+                </a>
+                <div class="flex-1">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-blue-600 rounded-lg">
+                            <i data-lucide="edit-3" class="w-6 h-6 text-white"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">
+                                Edit Project
+                            </h1>
+                            <p class="text-sm text-gray-600 mt-1">
+                                Perbarui informasi project "<%= project.name %>"
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Form Card -->
+        <div class="fade-in" style="animation-delay: 0.1s">
+            <div class="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+
+                <!-- Form Header -->
+                <div class="bg-linear-to-r from-blue-50 to-blue-100 px-6 sm:px-8 py-6 border-b border-blue-200">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-white rounded-lg shadow-sm">
+                            <i data-lucide="file-text" class="w-5 h-5 text-blue-600"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-lg font-bold text-gray-900">Detail Project</h2>
+                            <p class="text-sm text-gray-600">Ubah informasi dasar project</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Body -->
+                <form id="editProjectForm" class="p-6 sm:p-8">
+                    <div class="space-y-6">
+
+                        <!-- Project Name -->
+                        <div>
+                            <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+                                <i data-lucide="folder" class="w-4 h-4 text-gray-500"></i>
+                                Nama Project
+                                <span class="text-red-500">*</span>
+                            </label>
+                            <div class="relative">
+                                <input type="text" name="nama" id="projectName" required value="<%= project.nama %>"
+                                    class="input-focus w-full rounded-lg border-2 border-gray-200 px-4 py-3 text-sm transition-all hover:border-gray-300" />
+                                <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                    <i data-lucide="asterisk" class="w-4 h-4 text-gray-400"></i>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Project Description -->
+                        <div>
+                            <label class="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+                                <i data-lucide="align-left" class="w-4 h-4 text-gray-500"></i>
+                                Deskripsi Project
+                                <span class="text-xs font-normal text-gray-500">(Opsional)</span>
+                            </label>
+                            <textarea name="deskripsi" id="deskripsi" rows="4"
+                                placeholder="Tambahkan deskripsi untuk memberikan konteks lebih..."
+                                class="input-focus w-full rounded-lg border-2 border-gray-200 px-4 py-3 text-sm transition-all hover:border-gray-300 resize-none"><%= project.description || '' %></textarea>
+                        </div>
+
+                        <!-- Task Management Info Box -->
+                        <div
+                            class="rounded-lg bg-linear-to-r from-green-50 to-emerald-50 border-2 border-green-200 p-4">
+                            <div class="flex gap-3">
+                                <div class="shrink-0">
+                                    <div
+                                        class="w-10 h-10 flex items-center justify-center rounded-lg bg-white shadow-sm">
+                                        <i data-lucide="check-square" class="w-5 h-5 text-green-600"></i>
+                                    </div>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="text-sm font-semibold text-gray-900 mb-1 flex items-center gap-2">
+                                        Kelola Task Project
+                                        <span
+                                            class="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-xs font-bold">
+                                            <%= typeof tasks !=='undefined' ? tasks.length : 0 %> Tasks
+                                        </span>
+                                    </h4>
+                                    <p class="text-sm text-gray-700 mb-3">
+                                        Untuk menambah, mengedit, atau menghapus task, gunakan halaman manajemen task
+                                        khusus.
+                                    </p>
+                                    <a href="/projects-page/<%= project.id %>/tasks"
+                                        class="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-green-600/30 transition-all hover:bg-green-700 hover:shadow-xl active:scale-95">
+                                        <i data-lucide="list-checks" class="w-4 h-4"></i>
+                                        <span>Kelola Task</span>
+                                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="mt-8 pt-6 border-t border-gray-200">
+                        <div class="flex flex-col sm:flex-row gap-3 justify-between">
+                            <a href="<%= backUrl %>"
+                                class="inline-flex items-center justify-center gap-2 rounded-lg bg-white border-2 border-gray-200 px-5 py-3 text-sm font-semibold text-gray-700 transition-all hover:border-gray-300 hover:bg-gray-50 active:scale-95">
+                                <i data-lucide="x" class="w-4 h-4"></i>
+                                <span>Batal</span>
+                            </a>
+
+                            <button type="submit"
+                                class="btn-gradient inline-flex items-center justify-center gap-2 rounded-lg px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/30 hover:shadow-xl hover:shadow-blue-600/40">
+                                <i data-lucide="save" class="w-4 h-4"></i>
+                                <span>Simpan Perubahan</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="hidden fixed inset-0 bg-black bg-opacity-50 items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all fade-in">
+            <div class="flex items-center gap-3 mb-4">
+                <div class="p-2 bg-red-100 rounded-lg">
+                    <i data-lucide="alert-triangle" class="w-6 h-6 text-red-600"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">Konfirmasi Hapus Project</h3>
+            </div>
+
+            <p class="text-sm text-gray-600 mb-2">
+                Apakah Anda yakin ingin menghapus project "<span class="font-semibold">
+                    <%= project.name %>
+                </span>"?
+            </p>
+
+            <div class="rounded-lg bg-red-50 border border-red-200 p-3 mb-6">
+                <p class="text-sm text-red-800 font-semibold mb-1">⚠️ Peringatan:</p>
+                <ul class="text-xs text-red-700 space-y-1">
+                    <li>• Semua task dalam project akan ikut terhapus</li>
+                    <li>• Tindakan ini tidak dapat dibatalkan</li>
+                    <li>• Data akan hilang permanen</li>
+                </ul>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="closeDeleteModal()"
+                    class="flex-1 rounded-lg bg-gray-100 px-4 py-2.5 text-sm font-semibold text-gray-700 transition-all hover:bg-gray-200 active:scale-95">
+                    Batal
+                </button>
+                <button onclick="deleteProject()"
+                    class="flex-1 rounded-lg bg-red-600 px-4 py-2.5 text-sm font-semibold text-white">
+                    Ya, Hapus
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const form = document.getElementById('editProjectForm');
+
+        // Auto-focus first input
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('projectName').focus();
+        });
+
+        // Submit via PATCH API
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const submitBtn = form.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML =
+                '<i data-lucide="loader-2" class="w-4 h-4 inline mr-2 animate-spin"></i> Menyimpan...';
+            lucide.createIcons();
+
+            const formData = new FormData(form);
+
+            const payload = {
+                nama: formData.get('nama'),
+                deskripsi: formData.get('deskripsi'),
+            };
+
+            try {
+                const res = await fetch('/projects/<%= project.id %>', {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                const result = await res.json();
+
+                if (!res.ok) {
+                    alert(result.message || 'Gagal memperbarui project');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Simpan Perubahan';
+                    return;
+                }
+
+                window.location.href = `/projects-page/<%= project.id %>/tasks?success=project_updated`;
+            } catch (err) {
+                alert('Terjadi kesalahan saat menyimpan data');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Simpan Perubahan';
+            }
+        });
+
+        // ===== DELETE MODAL =====
+        function confirmDelete() {
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeDeleteModal();
+        });
+
+        document.getElementById('deleteModal').addEventListener('click', (e) => {
+            if (e.target.id === 'deleteModal') closeDeleteModal();
+        });
+
+        async function deleteProject() {
+            try {
+                const res = await fetch('/projects/<%= project.id %>', {
+                    method: 'DELETE',
+                });
+
+                const result = await res.json();
+
+                if (!res.ok) {
+                    alert(result.message || 'Gagal menghapus project');
+                    return;
+                }
+
+                window.location.href = '/projects?success=project_deleted';
+            } catch {
+                alert('Terjadi kesalahan saat menghapus project');
+            }
+        }
+    </script>
+</body>
+
+</html>
