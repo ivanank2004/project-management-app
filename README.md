@@ -17,20 +17,17 @@ yarn install
 
 ### 2. Buat file .env di directory root, kemudian isi dengan ini:
 ```bash
-# App
-APP_PORT=..... # (Default: 3000)
+APP_PORT=... (Default 3000)
 
-# Session
-SESSION_SECRET=..... # (Random)
-SESSION_MAX_AGE=..... # (Lama session, bebas)
+DB_TYPE=sqlite
+DB_DATABASE=db.sqlite
+DB_SYNCHRONIZE=true
+
+SESSION_SECRET=..... (bebas)
+SESSION_NAME=..... (bebas)
 ```
 
-### 3. Seed data user (admin)
-```bash
-npx ts-node src/seed/seed.ts
-```
-
-### 4. Jalankan aplikasi
+### 3. Jalankan aplikasi
 #### Mode Development
 ```bash
 npm run start:dev
@@ -41,14 +38,14 @@ npm run build
 npm run start:prod
 ```
 
-### 5. Akses aplikasi
+### 4. Akses aplikasi
 ```bash
 http://localhost:PORT
 ```
 
-### 6. Akses dokumentasi endpoint
+### 5. Akses dokumentasi endpoint
 ```bash
-http://localhost:PORT/api/docs
+http://localhost:PORT/api
 ```
 
 ---
@@ -103,29 +100,38 @@ http://localhost:PORT/api/docs
   - Form create & edit project
   - Daftar task per project
   - Form create & edit task
-
+ 
 ---
 
 ## Teknologi yang Digunakan
+
 ### Backend
-- **Node.js** (disarankan ≥ v18)
+- **Node.js** ≥ v18  
 - **NestJS** `^11.x`
+  - `@nestjs/common`
+  - `@nestjs/core`
+  - `@nestjs/platform-express`
+  - `@nestjs/config`
+  - `@nestjs/swagger`
 - **TypeScript** `^5.7`
 - **Express**
 
 ### Database & ORM
 - **TypeORM** `^0.3.x`
-- **SQLite** `^5.x`
+- **SQLite3** `^5.1`
+- `@nestjs/typeorm`
 
 ### Authentication & Session
 - **express-session** `^1.19`
-- **bcrypt** `^6.0` (password hashing)
-- **connect-sqlite3** `^0.9` (session store)
+- **connect-sqlite3** `^0.9`
+- **bcrypt** `^6.0`
+- `class-validator`
+- `class-transformer`
 
 ### View & UI
 - **EJS** `^4.0`
-- **express-ejs-layouts** `^2.5`
 - **Tailwind CSS** `^4.1`
+- `@tailwindcss/cli`
 
 ---
 
