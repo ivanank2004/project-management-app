@@ -1,98 +1,218 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Project Management App
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Aplikasi manajemen project berbasis **NestJS** dengan sistem autentikasi sederhana dan fitur pengelolaan project serta task. Aplikasi ini dirancang untuk membantu pengguna mengatur project, memecahnya menjadi beberapa task, serta memantau progres penyelesaiannya.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+---
 
-## Description
+## Cara Run
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Project setup
-
+### 1. Install dependancy
 ```bash
-$ npm install
+npm install
+```
+Atau menggunakan yarn:
+```bash
+yarn install
 ```
 
-## Compile and run the project
-
+### 2. Buat file .env di directory root, kemudian isi dengan ini:
 ```bash
-# development
-$ npm run start
+# App
+APP_PORT=..... # (Default: 3000)
 
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+# Session
+SESSION_SECRET=..... # (Random)
+SESSION_MAX_AGE=..... # (Lama session, bebas)
 ```
 
-## Run tests
-
+### 3. Seed data user (admin)
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npx ts-node src/seed/seed.ts
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
+### 4. Jalankan aplikasi
+#### Mode Development
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+npm run start:dev
+```
+#### Mode Production
+```bash
+npm run build
+npm run start:prod
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### 5. Akses aplikasi
+```bash
+http://localhost:PORT
+```
 
-## Resources
+### 6. Akses dokumentasi endpoint
+```bash
+http://localhost:PORT/api/docs
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+---
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## Fitur Utama
 
-## Support
+### 1. Autentikasi Pengguna
+- Login menggunakan email dan password
+- Validasi kredensial pengguna dengan enkripsi password (bcrypt)
+- Manajemen sesi berbasis session (Express Session)
+- Logout untuk mengakhiri sesi pengguna
+- Proteksi halaman login agar tidak dapat diakses oleh user yang sudah login
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### 2. Manajemen Project
+- Menampilkan daftar seluruh project
+- Menampilkan jumlah project yang telah selesai
+- Membuat project baru dengan:
+  - Nama project
+  - Deskripsi project
+  - Minimal satu task
+- Validasi input project (nama wajib, panjang maksimal, dan unik)
+- Mengedit data project (nama dan deskripsi)
+- Menghapus project
+- Menandai project sebagai selesai (completed)
+- Project yang sudah selesai tidak dapat dimodifikasi
 
-## Stay in touch
+### 3. Manajemen Task
+- Menampilkan daftar task berdasarkan project
+- Menambahkan satu atau lebih task ke dalam project
+- Mengedit task (judul dan deskripsi)
+- Menghapus task
+- Menandai task sebagai selesai atau belum selesai
+- Status task terintegrasi dengan status project
+- Task tidak dapat diubah jika project sudah selesai
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### 4. Status & Progres Project
+- Mengambil status project berdasarkan progres task
+- Informasi status project tersedia melalui endpoint khusus
+- Digunakan untuk monitoring progres project secara keseluruhan
 
-## License
+### 5. Validasi & Error Handling
+- Validasi ID project dan task
+- Penanganan error untuk data tidak ditemukan
+- Pesan error yang informatif pada form
+- Fallback aman saat terjadi kesalahan server
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+### 6. Server-Side Rendering
+- Menggunakan template engine untuk render halaman
+- Halaman yang tersedia:
+  - Login
+  - Daftar project
+  - Form create & edit project
+  - Daftar task per project
+  - Form create & edit task
+
+---
+
+## Teknologi yang Digunakan
+### Backend
+- **Node.js** (disarankan ≥ v18)
+- **NestJS** `^11.x`
+- **TypeScript** `^5.7`
+- **Express**
+
+### Database & ORM
+- **TypeORM** `^0.3.x`
+- **SQLite** `^5.x`
+
+### Authentication & Session
+- **express-session** `^1.19`
+- **bcrypt** `^6.0` (password hashing)
+- **connect-sqlite3** `^0.9` (session store)
+
+### View & UI
+- **EJS** `^4.0`
+- **express-ejs-layouts** `^2.5`
+- **Tailwind CSS** `^4.1`
+
+---
+
+## Tujuan Pengembangan
+Aplikasi ini dibuat sebagai:
+- Media pembelajaran backend dengan NestJS
+- Implementasi konsep MVC dan service-based architecture
+- Latihan pengelolaan relasi data (Project & Task)
+- Simulasi aplikasi manajemen project sederhana
+
+---
+
+## Desain Database
+
+Aplikasi ini menggunakan database relasional dengan **TypeORM**. Desain database terdiri dari tiga entitas utama: **User**, **Project**, dan **Task**, yang saling berelasi untuk mendukung fitur manajemen project dan task.
+
+### 1. User
+
+Entitas **User** menyimpan data akun pengguna yang dapat mengakses aplikasi.
+
+**Tabel:** `users`
+
+| Kolom     | Tipe Data | Keterangan |
+|----------|----------|------------|
+| id       | number   | Primary key (auto increment) |
+| email    | string   | Email pengguna (unik) |
+| password | string   | Password pengguna (hashed) |
+| isActive | boolean  | Status aktif akun |
+
+Catatan:
+- Email bersifat unik untuk mencegah duplikasi akun.
+- `isActive` digunakan untuk menonaktifkan akun tanpa menghapus data.
+
+---
+
+### 2. Project
+
+Entitas **Project** merepresentasikan sebuah project yang berisi kumpulan task.
+
+**Tabel:** `projects`
+
+| Kolom        | Tipe Data | Keterangan |
+|-------------|----------|------------|
+| id          | number   | Primary key |
+| name        | string   | Nama project |
+| description | text     | Deskripsi project (opsional) |
+| isCompleted | boolean  | Status penyelesaian project |
+
+Relasi:
+- Satu **Project** dapat memiliki banyak **Task** (One-to-Many).
+
+---
+
+### 3. Task
+
+Entitas **Task** menyimpan detail pekerjaan yang berada di dalam sebuah project.
+
+**Tabel:** `tasks`
+
+| Kolom        | Tipe Data | Keterangan |
+|-------------|----------|------------|
+| id          | number   | Primary key |
+| title       | string   | Judul task |
+| description | text     | Deskripsi task (opsional) |
+| isCompleted | boolean  | Status task |
+| projectId  | number   | Foreign key ke tabel `projects` |
+
+Relasi:
+- Setiap **Task** hanya dimiliki oleh satu **Project** (Many-to-One).
+- Menggunakan **CASCADE DELETE**, sehingga jika project dihapus, seluruh task terkait akan ikut terhapus.
+
+---
+
+## Screenshot Aplikasi
+
+### 1. Halaman Login
+![Screenshot Login](asset/Screenshot_85.png)
+
+### 2. Halaman Daftar Project
+![Screenshot Create Project](asset/Screenshot_87.png)
+
+### 3. Halaman Detail Project (beserta Task)
+![Screenshot Task List](asset/Screenshot_88.png)
+
+### 4. Halaman Tambah Project
+![Screenshot Edit Project](asset/Screenshot_89.png)
+
+### 5. Halaman Tambah Task
+![Screenshot Completed Project](asset/Screenshot_90.png)
+
