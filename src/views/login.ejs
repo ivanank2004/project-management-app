@@ -208,13 +208,10 @@
 
     <script src="/js/login.js"></script>
     <script>
-        // Initialize Lucide icons
         lucide.createIcons();
 
-        // Set current year
         document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-        // Toggle password visibility
         function togglePassword() {
             const passwordInput = document.getElementById('password');
             const eyeIcon = document.getElementById('eye-icon');
@@ -230,12 +227,10 @@
             lucide.createIcons();
         }
 
-        // Auto-focus email input
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('email').focus();
         });
 
-        // Form validation
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
         const emailError = document.getElementById('email-error');
@@ -267,7 +262,6 @@
             }
         });
 
-        // Clear errors on input
         emailInput.addEventListener('input', () => {
             if (!emailError.classList.contains('hidden')) {
                 emailInput.classList.remove('input-error', 'border-red-300');

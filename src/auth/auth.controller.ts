@@ -1,4 +1,3 @@
-// src/auth/auth.controller.ts
 import { Controller, Post, Body, Req, Get, BadRequestException, UnauthorizedException, } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import type { Request } from 'express';

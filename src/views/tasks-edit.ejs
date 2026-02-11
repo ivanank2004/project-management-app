@@ -203,7 +203,7 @@
         const form = document.getElementById('editTaskForm');
 
         form.addEventListener('submit', async (e) => {
-            e.preventDefault(); // ⛔ stop submit HTML
+            e.preventDefault();
 
             const submitBtn = form.querySelector('button[type="submit"]');
             submitBtn.disabled = true;
@@ -232,7 +232,6 @@
 
                 if (!res.ok) throw new Error();
 
-                // redirect manual (karena fetch)
                 window.location.href =
                     `/projects-page/<%= projectId %>/tasks?success=task_updated`;
 

@@ -1,4 +1,3 @@
-// src/auth/auth.page.controller.ts
 import { Controller, Get, Res } from '@nestjs/common';
 import type { Response } from 'express';
 

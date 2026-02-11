@@ -223,12 +223,10 @@
 
         const form = document.getElementById('editProjectForm');
 
-        // Auto-focus first input
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('projectName').focus();
         });
 
-        // Submit via PATCH API
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
 

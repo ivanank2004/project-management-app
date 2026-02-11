@@ -206,7 +206,6 @@
             </div>
         `;
 
-            // tombol hapus
             div.querySelector('button').addEventListener('click', () => {
                 div.remove();
                 updateNumbers();
@@ -255,7 +254,6 @@
                     return;
                 }
 
-                // sukses → redirect manual
                 window.location.href =
                     `/projects-page/<%= projectId %>/tasks?success=task_created`;
 
