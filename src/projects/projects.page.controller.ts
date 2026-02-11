@@ -54,7 +54,7 @@ export class ProjectsPageController {
                 });
             }
 
-            return res.redirect('/projects-page');
+            return res.redirect('/projects-page?success=project_created');
 
         } catch (err: any) {
             return res.status(400).render('projects-create', {
@@ -84,7 +84,7 @@ export class ProjectsPageController {
                 backUrl: res.req.headers.referer || '/projects-page',
             });
         } catch {
-            return res.redirect('/projects-page');
+            return res.redirect('/projects-page?success=project_updated');
         }
     }
 }

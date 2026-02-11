@@ -193,56 +193,7 @@
         </div>
     </div>
 
-    <script>
-        lucide.createIcons();
-
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('nama').focus();
-        });
-
-        const form = document.getElementById('editTaskForm');
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const submitBtn = form.querySelector('button[type="submit"]');
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = `
-      <i data-lucide="loader-2" class="w-4 h-4 inline mr-2 animate-spin"></i>
-      Menyimpan...
-    `;
-            lucide.createIcons();
-
-            const data = {
-                nama: document.getElementById('nama').value,
-                deskripsi: document.getElementById('deskripsi').value,
-            };
-
-            try {
-                const res = await fetch(
-                    `/projects/<%= projectId %>/tasks/<%= task.id %>`,
-                    {
-                        method: 'PATCH',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify(data),
-                    }
-                );
-
-                if (!res.ok) throw new Error();
-
-                window.location.href =
-                    `/projects-page/<%= projectId %>/tasks?success=task_updated`;
-
-            } catch (err) {
-                alert('Gagal memperbarui task');
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Simpan Perubahan';
-            }
-        });
-    </script>
-
+    <script src="/js/tasks.js"></script>
 </body>
 
 </html>

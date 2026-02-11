@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+        <%= statusCode %> - <%= title %>
+    </title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+
+    <div class="min-h-screen flex items-center justify-center px-4 py-8">
+        <div class="relative z-10 w-full max-w-md">
+            <div class="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+
+                <!-- Header -->
+                <div class="bg-gradient-to-r <%= headerGradient %> px-8 py-8 text-center border-b <%= headerBorder %>">
+                    <div class="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-2xl bg-white shadow-lg">
+                        <i data-lucide="<%= icon %>" class="w-10 h-10 <%= iconColor %>"></i>
+                    </div>
+
+                    <p class="text-xs font-bold tracking-widest <%= textColor %> uppercase mb-2">
+                        Error <%= statusCode %>
+                    </p>
+
+                    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">
+                        <%= title %>
+                    </h1>
+                </div>
+
+                <!-- Body -->
+                <div class="px-8 py-8">
+                    <div class="flex">
+                        <% if (statusCode===401) { %>
+                            <a href="/login"
+                                class="w-full inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700">
+                                <i data-lucide="log-in" class="w-4 h-4"></i>
+                                Login
+                            </a>
+                            <% } else { %>
+                                <button onclick="goBack()"
+                                    class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-white border-2 border-gray-200 px-5 py-3 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+                                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                                    Kembali
+                                </button>
+                                <% } %>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="bg-gray-50 px-8 py-4 border-t border-gray-100 text-center">
+                    <p class="text-xs text-gray-400">
+                        © <%= new Date().getFullYear() %> Project Management App.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        function goBack() {
+            if (document.referrer) window.history.back();
+            else window.location.href = '/projects-page';
+        }
+    </script>
+
+</body>
+
+</html>

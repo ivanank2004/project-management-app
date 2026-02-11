@@ -21,6 +21,11 @@ form.addEventListener('submit', async (e) => {
             body: JSON.stringify({ email, password }),
         });
 
+        const contentType = res.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Server tidak mengembalikan response yang valid');
+        }
+
         const data = await res.json();
 
         if (!res.ok) {

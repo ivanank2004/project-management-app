@@ -8,6 +8,7 @@ import { join } from 'path';
 import express from 'express';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { GlobalExceptionFilter } from './common/http-exception.filter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -59,6 +60,7 @@ async function bootstrap() {
 
   app.setViewEngine('ejs');
   app.setBaseViewsDir(join(__dirname, '..', 'src/views'));
+  app.useGlobalFilters(new GlobalExceptionFilter());
 
   await app.listen(process.env.APP_PORT || 3000);
 }
