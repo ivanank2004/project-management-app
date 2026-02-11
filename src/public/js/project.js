@@ -75,9 +75,11 @@ function updateStats() {
     const isEmpty = total === 0;
     const emptyState = document.getElementById('emptyState');
     const searchSection = document.getElementById('searchSection');
+    const statsSection = document.getElementById('statsSection');
 
     if (emptyState) emptyState.classList.toggle('hidden', !isEmpty);
     if (searchSection) searchSection.classList.toggle('hidden', isEmpty);
+    if (statsSection) statsSection.classList.toggle('hidden', isEmpty);
 }
 
 // Helper to escape HTML
@@ -104,11 +106,25 @@ function render() {
     const mobileList = document.getElementById('mobileList');
 
     if (total === 0) {
-        if (desktopTable) desktopTable.classList.add('hidden');
-        if (mobileList) mobileList.classList.add('hidden');
+        if (desktopTable) {
+            desktopTable.classList.add('hidden');
+            desktopTable.classList.remove('lg:block'); // Hapus block class
+        }
+        if (mobileList) {
+            mobileList.classList.add('hidden');
+            mobileList.classList.remove('block');
+        }
     } else {
-        if (desktopTable) renderDesktopTable(visible, start);
-        if (mobileList) renderMobileCards(visible);
+        if (desktopTable) {
+            desktopTable.classList.remove('hidden');
+            desktopTable.classList.add('lg:block'); // Kembalikan lg:block
+            renderDesktopTable(visible, start);
+        }
+        if (mobileList) {
+            mobileList.classList.remove('hidden');
+            mobileList.classList.add('block');
+            renderMobileCards(visible);
+        }
     }
 
     updatePaginationBar(total, start, end, pageCount);
@@ -293,15 +309,41 @@ function updatePaginationBar(total, start, end, pageCount) {
     const wrapper = document.getElementById('paginationWrapper');
     if (!wrapper) return;
 
-    wrapper.style.display = total === 0 ? 'none' : '';
+    // Sembunyikan jika tidak ada project ATAU hanya ada 1 halaman
+    wrapper.classList.toggle('hidden', total === 0 || pageCount <= 1);
 
     const pageFrom = document.getElementById('pageFrom');
     const pageTo = document.getElementById('pageTo');
     const pageTotal = document.getElementById('pageTotal');
+    const pageInfo = document.getElementById('pageInfo');
 
-    if (pageFrom) pageFrom.textContent = total === 0 ? 0 : start + 1;
-    if (pageTo) pageTo.textContent = end;
+    if (total === 0) {
+        if (pageFrom) pageFrom.textContent = '0';
+        if (pageTo) pageTo.textContent = '0';
+        if (pageTotal) pageTotal.textContent = '0';
+        return;
+    }
+
     if (pageTotal) pageTotal.textContent = total;
+
+    // Jika menampilkan semua atau hanya 1 halaman, sederhanakan teksnya
+    if (perPage === 'all' || pageCount === 1) {
+        if (pageInfo) {
+            pageInfo.innerHTML = `Menampilkan <span class="font-semibold text-gray-900">${total}</span> project`;
+        }
+    } else {
+        // Kembalikan format range jika perlu (antisipasi innerHTML yang mungkin sudah berubah)
+        if (pageInfo) {
+            pageInfo.innerHTML = `
+                Menampilkan <span class="font-semibold text-gray-900" id="pageFrom">${start + 1}</span>–<span
+                class="font-semibold text-gray-900" id="pageTo">${end}</span>
+                dari <span class="font-semibold text-gray-900" id="pageTotal">${total}</span> project
+            `;
+        } else {
+            if (pageFrom) pageFrom.textContent = start + 1;
+            if (pageTo) pageTo.textContent = end;
+        }
+    }
 
     const container = document.getElementById('pageButtons');
     if (!container) return;
@@ -597,7 +639,34 @@ function initSortable() {
 
 function initEditProjectForm() {
     const form = document.getElementById('editProjectForm');
-    if (!form) return;
+    const submitBtn = document.getElementById('submitBtn');
+    const nameInput = document.getElementById('projectName');
+    const descInput = document.getElementById('deskripsi');
+
+    if (!form || !submitBtn || !nameInput || !descInput) return;
+
+    // Simpan nilai awal
+    const initialValues = {
+        nama: nameInput.value.trim(),
+        deskripsi: descInput.value.trim()
+    };
+
+    function checkChanges() {
+        const currentValues = {
+            nama: nameInput.value.trim(),
+            deskripsi: descInput.value.trim()
+        };
+
+        const hasChanged = currentValues.nama !== initialValues.nama ||
+            currentValues.deskripsi !== initialValues.deskripsi;
+
+        const isNameValid = currentValues.nama.length > 0;
+
+        submitBtn.disabled = !hasChanged || !isNameValid;
+    }
+
+    nameInput.addEventListener('input', checkChanges);
+    descInput.addEventListener('input', checkChanges);
 
     form.addEventListener('submit', async (e) => {
         e.preventDefault();

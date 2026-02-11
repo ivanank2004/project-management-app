@@ -35,10 +35,16 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         }
 
         const acceptHeader = request.headers.accept || '';
+        const contentType = request.headers['content-type'] || '';
+
         const isApiRequest =
             acceptHeader.includes('application/json') ||
+            contentType.includes('application/json') ||
             (request.path.startsWith('/auth') && request.method === 'POST') ||
-            (request.path.startsWith('/api'));
+            (request.path.startsWith('/api')) ||
+            (request.path.startsWith('/projects') &&
+                (contentType.includes('application/json') ||
+                    !acceptHeader.includes('text/html')));
 
         if (isApiRequest) {
             return response.status(status).json({

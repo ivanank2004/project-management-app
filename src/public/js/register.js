@@ -193,6 +193,11 @@ form.addEventListener('submit', async (e) => {
         strengthBar.className = 'password-strength bg-gray-200';
         strengthText.textContent = 'Minimal 6 karakter';
 
+        // Redirect ke login dengan pesan sukses
+        setTimeout(() => {
+            window.location.href = '/login?registered=true';
+        }, 1500);
+
     } catch (err) {
         errorMessage.textContent = err.message;
         errorBox.classList.remove('hidden');
